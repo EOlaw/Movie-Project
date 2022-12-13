@@ -1,12 +1,19 @@
 const express = require('express');
-const app = express();
 const path = require('path');
-const User = require('./models/user');
-const bcrypt = require('bcrypt');
-const session = require('express-session');
+const app = express();
 const ejsMate = require('ejs-mate');
-const movies = require('./models/movies');
-const loginRoutes = require('./routes/login')
+const session = require('express-session');
+const flash = require('connect-flash');
+//const ExpressError = require('./utils/ExpressError');
+const methodOverride = require('method-override');
+const passport = require('passport');
+const passportLocal = require('passport-local');
+const User = require('./models/user');
+const users = require('./controllers/users')
+
+//Calling out the routes files
+const userRoutes = require('./routes/users')
+
 
 
 //Connection to Mongoose
@@ -19,37 +26,83 @@ db.once("open", () => {
     console.log("Database connected");
 });
 
+
+
 //Set the view engine to ejs
 app.set('view engine', 'ejs');
 app.engine('ejs', ejsMate)
 app.set('views', path.join(__dirname, 'views'));
 
-//Configure the app
-app.use(express.urlencoded({ extended: true })); //use for user authentication
+
+//configure app
+app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: 'notagoodsecret' })) //use for user authentication
-app.use(express.static('public'))
+app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname, 'public')))
 app.use('/img', express.static(__dirname + 'public/img')) //to load images
 
+//app.use(session(sessionConfig))
 
-//requireLogin
-const requireLogin = (req, res, next) => {
-    if (!req.session.user_id) {
-        return res.redirect('/login')
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(flash());
+
+passport.use(new passportLocal(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+})
+//Blocking pages without authentication
+const isLoggedIn = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        req.session.returnTo = req.originalUrl;
+        req.flash('error', 'You must be signed in first!');
+        return res.redirect('/login');
     }
     next();
 }
 
-//APP.USE
-app.use('/login', loginRoutes)
 
 
-//APP.GET
+app.use('/', userRoutes)
+
+app.get('/majidahs', isLoggedIn, (req, res) => {
+    res.render('majidahs')
+})
 app.get('/', (req, res) => {
-    res.send('I love coding')
+    res.render('majidahs/index')
+})
+app.get('/home', isLoggedIn, (req, res) => {
+    res.render('majidahs/home')
+})
+app.get('/movies', isLoggedIn, (req, res) => {
+    res.render('majidahs/movies')
+})
+app.get('/tv-shows', isLoggedIn, (req, res) => {
+    res.render('majidahs/tv-shows')
+})
+app.get('/new-and-popular', isLoggedIn, (req, res) => {
+    res.render('majidahs/new-and-popular')
+})
+app.get('/account-setting', isLoggedIn, (req, res) => {
+    res.render('majidahs/account-setting')
 })
 
 
-//Serving Up
+
+
+
+
+
 app.listen(3000, () => {
-    console.log("Serving up on localhost:3000")
+    console.log("Listening on port: localhost:3000")
 })

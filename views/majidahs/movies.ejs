@@ -1,0 +1,32 @@
+<% layout('layouts/boilerplate')%>
+<!--
+ <link rel="stylesheet" href="/stylesheets/movies.css">
+-->
+<h1>Movies</h1>
+
+<style>
+    .content {
+        border: 1px solid red;
+        height: 300px;
+        display: none;
+    }
+    .content div {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        align-items: center;
+        margin: 10px;
+    }
+    .content-display {
+        display: block;
+    }
+    
+</style>
+
+
+<div id="movies-searchable"></div>
+<div id="movies-container"></div>
+
+<script src="/javascripts/app.js"></script>
+
+
