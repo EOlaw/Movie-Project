@@ -76,25 +76,25 @@ const isLoggedIn = (req, res, next) => {
 app.use('/', userRoutes)
 
 app.get('/majidahs', isLoggedIn, (req, res) => {
-    res.render('majidahs')
+    res.render('majidahs', { User: req.user })
 })
 app.get('/', (req, res) => {
     res.render('majidahs/index')
 })
 app.get('/home', isLoggedIn, (req, res) => {
-    res.render('majidahs/home')
+    res.render('majidahs/home', { User: req.user })
 })
 app.get('/movies', isLoggedIn, (req, res) => {
-    res.render('majidahs/movies')
+    res.render('majidahs/movies', { User: req.user })
 })
 app.get('/tv-shows', isLoggedIn, (req, res) => {
-    res.render('majidahs/tv-shows')
+    res.render('majidahs/tv-shows', { User: req.user })
 })
 app.get('/new-and-popular', isLoggedIn, (req, res) => {
-    res.render('majidahs/new-and-popular')
+    res.render('majidahs/new-and-popular', { User: req.user })
 })
 app.get('/account-setting', isLoggedIn, (req, res) => {
-    res.render('majidahs/account-setting')
+    res.render('majidahs/account-setting', { User: req.user })
 })
 
 
