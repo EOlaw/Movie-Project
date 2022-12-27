@@ -75,12 +75,15 @@ const isLoggedIn = (req, res, next) => {
 
 app.use('/', userRoutes)
 
+
+app.get('/', (req, res) => {
+    res.render('majidahs/homepage')
+})
+
 app.get('/majidahs', isLoggedIn, (req, res) => {
     res.render('majidahs', { User: req.user })
 })
-app.get('/', (req, res) => {
-    res.render('majidahs/index')
-})
+
 app.get('/home', isLoggedIn, (req, res) => {
     res.render('majidahs/home', { User: req.user })
 })
